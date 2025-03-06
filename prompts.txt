@@ -1,0 +1,19 @@
+{
+                    "type": "text",
+                    "text": (
+                        "Critically examine the following website screenshot and determine whether the website meets exceptionally high-quality standards with a cutting-edge, modern design. "
+                        "A 'good website' must have a flawlessly modern and professionally designed layout that is visually stunning and flawlessly organized, with clear and intuitive navigation, perfect alignment, "
+                        "and a refined, consistent use of typography and color schemes that reflect the latest trends. The site must appear fully loaded, error-free, and exude a sleek, contemporary aesthetic. "
+                        "Even minor design flaws, outdated elements, or visual inconsistencies render the website 'not good'. Provide your answer as a single label ('good website' or 'not good website') along with a detailed explanation."
+                    )
+                },
+
+
+                "text": (
+                        "CRITICALLY and RUTHLESSLY examine the following website screenshot with an ultra-strict focus on the tiniest possible design shortcomings. "
+                        "The website must be flawlessly modern and immaculate in its professional design, with no room for even marginal errors. It must exhibit a perfectly executed layout that is visually striking and hyper-organized, with impeccable alignment, "
+                        "seamless responsiveness, crystal-clear and intuitive navigation, and a masterful, consistent usage of contemporary typography and color schemes. Any page elements that appear even slightly out-of-date or misaligned, "
+                        "or any evidence of incomplete loading, performance issues, or design inconsistencies of any kind, should lead to the harsh conclusion that the website is 'not good'. "
+                        "Provide your answer as one decisive label ('good website' or 'not good website') followed by a detailed explanation of your reasoning."
+                    )
+                },
