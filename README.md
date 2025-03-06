@@ -1,79 +1,131 @@
-# SalesAgent
+# SearchAgent
 
-## Overview
-This project evaluates websites by pulling contact information from Apollo API, capturing website screenshots, and using OpenAI's GPT-4o model to classify websites based on their design and UX principles. The project generates both an HTML report and a CSV file containing websites that need improvement.
+A comprehensive sales automation toolkit that combines website analysis, SEMRush reporting, and automated email outreach.
 
-## Prerequisites
-- Python 3.7 or higher
-- Chrome browser installed (required for Selenium)
-- API keys for:
-  - Apollo (set via the `APOLLO_API_KEY` environment variable)
-  - OpenAI (set via the `OPENAI_API_KEY` environment variable)
+## Project Components
+
+### 1. SEMRush Mailer (`/semrush_mailer`)
+Automates the process of generating and sending SEMRush reports via email.
+- `csv_test.py`: Main script for processing contacts and sending reports
+- `semrush_capture.py`: Captures SEMRush reports using Selenium
+- `mailgun_sender.py`: Handles email delivery through Mailgun
+- `email_preparer.py`: Prepares email templates and content
+- `apollo_sender.py`: (Legacy) Apollo API integration
+- `gmail_sender.py`: (Alternative) Gmail integration
+
+### 2. Website Analysis (`/`)
+Tools for analyzing and classifying websites:
+- `classify_website.py`: Main classification script using GPT-4
+- `screenshot_capture.py`: Captures website screenshots
+- `apollo.py`: Apollo API integration for contact data
+
+### 3. Utilities
+- `list_models.py`: OpenAI model management
+- `testing.py`: Test scripts
+- `upload.py`: File upload utilities
 
 ## Setup
 
-1. **Clone the Repository** (if needed):
-   ```bash
-   git clone <repository_url>
-   cd SalesAgent
-   ```
-
-2. **Create and Activate a Virtual Environment** (optional but recommended):
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-
-3. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Configure Environment Variables**:
-   Create a `.env` file in the project root with the following content:
-   ```bash
-   APOLLO_API_KEY=your_apollo_api_key
-   OPENAI_API_KEY=your_openai_api_key
-   ```
-   Replace `your_apollo_api_key` and `your_openai_api_key` with your actual API keys.
-
-## Running the Project
-
-To run the project, execute:
-
+1. Clone the repository:
 ```bash
-python classify_website.py
+git clone https://github.com/calvinbeighle/SearchAgent.git
+cd SearchAgent
 ```
 
-This script will:
-1. Fetch contact information and website URLs from Apollo using a specific list ID
-2. Process each website by:
-   - Capturing a screenshot using Selenium
-   - Analyzing the website design using OpenAI's GPT-4o model
-   - Generating detailed UX/design feedback
-3. Generate two outputs:
-   - An HTML report (`report.html`) with screenshots and full classification results
-   - A CSV file (`website_data.csv`) containing contact information for websites classified as "not good website"
+2. Create and activate virtual environment:
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
 
-## File Structure
+3. Install dependencies:
+```bash
+pip3 install -r requirements.txt
+```
 
-- `requirements.txt`: Lists all Python dependencies
-- `classify_website.py`: Main script that orchestrates the website classification process
-- `apollo.py`: Handles fetching contact data from Apollo API
-- `screenshot_capture.py`: Captures website screenshots using Selenium
-- `report.html`: Generated report with screenshots and classification results
-- `website_data.csv`: Generated CSV containing contact information for websites needing improvement
+4. Configure environment variables:
+Create a `.env` file with:
+```
+# SEMRush credentials
+SEMRUSH_EMAIL=your_email
+SEMRUSH_PASSWORD=your_password
 
-## Troubleshooting
+# Email sender information
+SENDER_NAME=Your Name
+SENDER_TITLE=Your Title
+SENDER_COMPANY=Your Company
 
-- **Chrome and ChromeDriver**: Ensure Chrome is installed and compatible with the ChromeDriver version. The project uses `webdriver-manager` for automatic driver management.
-- **API Keys**: Verify your API keys in the `.env` file if you encounter authentication issues.
-- **Dependencies**: Ensure all dependencies are installed via `pip install -r requirements.txt`.
-- **Apollo List ID**: The code is configured to pull contacts from a specific Apollo list (ID: 67a02758363e7e0021d20006). Update this ID in `apollo.py` if needed.
+# Mailgun credentials (for email sending)
+MAILGUN_API_KEY=your_mailgun_key
+MAILGUN_DOMAIN=your_domain
+
+# Optional API keys
+APOLLO_API_KEY=your_apollo_key
+OPENAI_API_KEY=your_openai_key
+```
+
+## Usage
+
+### SEMRush Report Generation and Emailing
+```bash
+cd semrush_mailer
+python3 csv_test.py test_contact.csv 1
+```
+This will:
+1. Read contacts from CSV
+2. Capture SEMRush reports
+3. Generate email previews
+4. Send emails through Mailgun
+
+### Website Classification
+```bash
+python3 classify_website.py
+```
+This will:
+1. Analyze websites using GPT-4
+2. Generate screenshots
+3. Create classification reports
+
+## Project Structure
+```
+SearchAgent/
+├── semrush_mailer/           # SEMRush report automation
+│   ├── templates/            # Email templates
+│   ├── email_previews/      # Generated email previews
+│   └── semrush_reports/     # Captured SEMRush reports
+├── csvs/                    # CSV data files
+├── oldreports/             # Historical reports
+├── oldscreenshots/         # Historical screenshots
+└── test/                   # Test files
+```
+
+## Features
+
+- **Automated SEMRush Reports**: Captures and processes SEMRush data
+- **Email Integration**: Supports multiple email providers (Mailgun, Gmail)
+- **Contact Management**: Integration with Apollo for contact data
+- **Website Analysis**: AI-powered website classification
+- **Customizable Templates**: Email template system
+- **Batch Processing**: Handle multiple contacts efficiently
+
+## Dependencies
+
+- Python 3.7+
+- Selenium WebDriver
+- Chrome/Chromium browser
+- Required Python packages in `requirements.txt`
 
 ## Notes
 
-- The project processes up to 60 websites per run
-- Screenshots are saved as `screenshot_[number].png`
-- The CSV file only includes websites classified as "not good website"
-- For assistance or customization needs, please contact calvin@angusmadethis.com
+- Generated reports are saved in `semrush_reports/`
+- Email previews are stored in `email_previews/`
+- Supports batch processing of contacts
+- Includes error handling and logging
+
+## Contributing
+
+Feel free to submit issues and enhancement requests.
+
+## Contact
+
+Calvin Beighle - calvin@angusdesign.com

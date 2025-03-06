@@ -1,50 +1,83 @@
 # SEMRush Mailer
 
-This program captures screenshots of SEMRush reports for websites and sends them via Apollo's mail merge functionality.
+Automated tool for generating and sending SEMRush reports via email.
+
+## Overview
+
+This tool automates the process of:
+1. Capturing SEMRush reports for specified websites
+2. Generating personalized emails with embedded reports
+3. Sending emails through Mailgun (or alternatively, Gmail)
 
 ## Setup
 
-1. Run the setup script:
-   ```
-   chmod +x setup.sh
-   ./setup.sh
-   ```
+1. Install dependencies:
+```bash
+./setup.sh
+# or
+pip3 install -r requirements.txt
+```
 
-2. Add your API keys to a `.env` file:
-   ```
-   APOLLO_API_KEY=your_apollo_api_key
-   OPENAI_API_KEY=your_openai_api_key
-   SENDER_NAME=Your Name
-   SENDER_TITLE=Your Position
-   SENDER_COMPANY=Your Company
-   ```
+2. Configure environment variables:
+Copy `.env.example` to `.env` and fill in:
+```
+# SEMRush credentials
+SEMRUSH_EMAIL=your_email
+SEMRUSH_PASSWORD=your_password
+
+# Email sender information
+SENDER_NAME=Your Name
+SENDER_TITLE=Your Title
+SENDER_COMPANY=Your Company
+
+# Mailgun credentials
+MAILGUN_API_KEY=your_mailgun_key
+MAILGUN_DOMAIN=your_domain
+```
 
 ## Usage
 
-Run the main script with the number of contacts to process:
-
+1. Prepare a CSV file with contacts:
+```csv
+email,first_name,last_name,company_name,website
+example@company.com,John,Doe,Company Inc,company.com
 ```
-python3 main.py 10
+
+2. Run the script:
+```bash
+python3 csv_test.py your_contacts.csv [number_of_contacts]
 ```
 
-This will:
-1. Fetch contacts from Apollo
-2. Capture SEMRush reports for each website
-3. Upload the reports to Apollo
-4. Create an email template with the reports embedded
-5. Start an email sequence to send the emails
+Example:
+```bash
+python3 csv_test.py test_contact.csv 1  # Process one contact
+```
 
-## Customization
+## Components
 
-You can customize the email template by editing the file in the `templates` directory. The default template includes:
-- Personalized greeting
-- SEMRush report image
-- Call-to-action button
-- Your signature
+- `csv_test.py`: Main script orchestrating the process
+- `semrush_capture.py`: Handles SEMRush login and report capture
+- `mailgun_sender.py`: Manages email sending through Mailgun
+- `email_preparer.py`: Prepares email templates and content
+- `gmail_sender.py`: Alternative email sender using Gmail
+- `apollo_sender.py`: Legacy Apollo integration
+
+## Output
+
+- Generated reports: `semrush_reports/`
+- Email previews: `email_previews/`
+- Debug screenshots: Saved during SEMRush capture process
 
 ## Troubleshooting
 
-If you encounter issues:
-- Check that your API keys are correct
-- Ensure you have proper permissions in Apollo
-- Check the logs for detailed error messages 
+- Check Chrome/ChromeDriver compatibility
+- Verify SEMRush credentials
+- Ensure Mailgun API key has proper permissions
+- Look for debug screenshots if SEMRush capture fails
+
+## Notes
+
+- Uses Selenium in visible mode for debugging
+- Supports base64-encoded images in emails
+- Includes error handling and logging
+- Can process multiple contacts in batch 
