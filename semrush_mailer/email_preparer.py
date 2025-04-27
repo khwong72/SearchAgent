@@ -47,7 +47,7 @@ if not os.path.exists(default_template_path):
                 <p>Would you be interested in a brief call to discuss how we could help improve these metrics?</p>
                 
                 <p>
-                    <a href="https://calendly.com/yourusername" class="cta-button">Book a 15-min call</a>
+                    <a href="https://calendly.com/wong-peter/catchup" class="cta-button">Book a 15-min call</a>
                 </p>
                 
                 <p>Best regards,<br>

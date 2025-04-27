@@ -1,6 +1,7 @@
 import os
 import logging
 import requests
+import base64
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -9,85 +10,29 @@ logger = logging.getLogger(__name__)
 # Load environment variables
 load_dotenv()
 MAILGUN_API_KEY = os.getenv("MAILGUN_API_KEY")
-MAILGUN_DOMAIN = os.getenv("MAILGUN_DOMAIN")
-SENDER_NAME = os.getenv("SENDER_NAME", "Calvin Beighle")
+MAILGUN_DOMAIN = "sandboxa8bc3f5031ff4356aa495c71afc9ab88.mailgun.org"  # Updated to use the working sandbox domain
+SENDER_NAME = os.getenv("SENDER_NAME", "Mailgun Sandbox")
 SENDER_TITLE = os.getenv("SENDER_TITLE", "Growth Consultant")
 SENDER_COMPANY = os.getenv("SENDER_COMPANY", "Angus Design")
-SENDER_EMAIL = "calvinbeighle@college.harvard.edu"  # Authorized sender email
+SENDER_EMAIL = "postmaster@sandboxa8bc3f5031ff4356aa495c71afc9ab88.mailgun.org"  # Updated to use the authorized sender
 
-def get_mailgun_domain():
-    """Get the Mailgun domain, fetching sandbox domain if needed"""
-    if not MAILGUN_API_KEY:
-        logger.error("Mailgun API key not found in environment variables")
-        return None
-        
-    try:
-        # Try to get list of domains
-        url = "https://api.mailgun.net/v3/domains"
-        auth = ("api", MAILGUN_API_KEY)
-        response = requests.get(url, auth=auth)
-        response.raise_for_status()
-        
-        domains = response.json().get('items', [])
-        
-        # Look for sandbox domain
-        for domain in domains:
-            if 'sandbox' in domain['name']:
-                logger.info(f"Found sandbox domain: {domain['name']}")
-                return domain['name']
-                
-        logger.warning("No sandbox domain found, using default")
-        return MAILGUN_DOMAIN
-        
-    except Exception as e:
-        logger.error(f"Error fetching Mailgun domains: {e}")
-        return MAILGUN_DOMAIN
-
-def upload_image_to_mailgun(image_path):
+def encode_image_to_base64(image_path):
     """
-    Upload an image to Mailgun's image hosting service
+    Encode an image to base64 for embedding in HTML
     
     Args:
         image_path (str): Path to the image file
-    
+        
     Returns:
-        str: URL of the uploaded image or None if failed
+        str: Base64-encoded image data URL
     """
-    if not MAILGUN_API_KEY:
-        logger.error("Mailgun API key not found in environment variables")
-        return None
-    
-    domain = get_mailgun_domain()
-    if not domain:
-        logger.error("Could not determine Mailgun domain")
-        return None
-    
     try:
-        logger.info(f"Uploading image to Mailgun: {image_path}")
-        
-        url = f"https://api.mailgun.net/v3/{domain}/messages.storage"
-        auth = ("api", MAILGUN_API_KEY)
-        
-        with open(image_path, 'rb') as f:
-            files = {'file': f}
-            response = requests.post(url, auth=auth, files=files)
-            
-            # Log the response for debugging
-            logger.debug(f"Response status: {response.status_code}")
-            logger.debug(f"Response text: {response.text[:500]}")
-            
-            response.raise_for_status()
-            
-            data = response.json()
-            if 'url' in data:
-                logger.info("Image uploaded successfully")
-                return data['url']
-            else:
-                logger.error(f"Unexpected response format: {data}")
-                return None
-                
+        with open(image_path, 'rb') as img_file:
+            image_data = img_file.read()
+            base64_encoded = base64.b64encode(image_data).decode('utf-8')
+            return f"data:image/png;base64,{base64_encoded}"
     except Exception as e:
-        logger.error(f"Error uploading image to Mailgun: {e}")
+        logger.error(f"Error encoding image: {e}")
         return None
 
 def send_email(to_email, subject, body_html):
@@ -106,10 +51,7 @@ def send_email(to_email, subject, body_html):
         logger.error("Mailgun API key not found in environment variables")
         return False
     
-    domain = get_mailgun_domain()
-    if not domain:
-        logger.error("Could not determine Mailgun domain")
-        return False
+    domain = MAILGUN_DOMAIN  # Use our hardcoded sandbox domain directly
     
     try:
         logger.info(f"Sending email to: {to_email}")
@@ -123,6 +65,9 @@ def send_email(to_email, subject, body_html):
             "subject": subject,
             "html": body_html
         }
+        
+        logger.debug(f"Sending with from: {SENDER_NAME} <{SENDER_EMAIL}>")
+        logger.debug(f"Using domain: {domain}")
         
         response = requests.post(url, auth=auth, data=data)
         
@@ -176,23 +121,12 @@ def send_emails_through_mailgun(successful_contacts):
         logger.info(f"Processing contact {i}/{len(successful_contacts)}: {email}")
         
         try:
-            # Upload image to Mailgun
-            image_path = contact_data["image_path"]
-            image_url = upload_image_to_mailgun(image_path)
-            
-            if not image_url:
-                logger.error(f"Failed to upload image for {email}, skipping")
-                failures += 1
-                continue
-            
-            # Update the HTML to use the Mailgun-hosted image
-            body_html = contact_data["body_html"].replace(
-                'src="data:image/png;base64,',
-                f'src="{image_url}'
-            )
+            # Instead of uploading to Mailgun, we'll use the image directly in base64 format
+            # The image is already encoded in base64 in the HTML
+            logger.info(f"Using base64 encoded image in email")
             
             # Send email through Mailgun
-            result = send_email(email, contact_data["subject"], body_html)
+            result = send_email(email, contact_data["subject"], contact_data["body_html"])
             
             if result:
                 logger.info(f"Successfully sent email to: {email}")
